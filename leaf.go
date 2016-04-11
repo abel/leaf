@@ -1,13 +1,17 @@
 package leaf
 
 import (
-	"github.com/name5566/leaf/cluster"
-	"github.com/name5566/leaf/conf"
-	"github.com/name5566/leaf/console"
-	"github.com/name5566/leaf/log"
-	"github.com/name5566/leaf/module"
+	"leaf/cluster"
+	"leaf/conf"
+	"leaf/console"
+	"leaf/log"
+	"leaf/module"
 	"os"
 	"os/signal"
+)
+
+var (
+	stopChan = make(chan int)
 )
 
 func Run(mods ...module.Module) {
@@ -38,9 +42,17 @@ func Run(mods ...module.Module) {
 	// close
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill)
-	sig := <-c
-	log.Release("Leaf closing down (signal: %v)", sig)
+	select {
+	case sig := <-c:
+		log.Release("Leaf closing down (signal: %v)", sig)
+	case reason := <-stopChan:
+		log.Release("Leaf closing down (reason: %v)", reason)
+	}
 	console.Destroy()
 	cluster.Destroy()
 	module.Destroy()
+}
+
+func Stop(reason int) {
+	stopChan <- reason
 }

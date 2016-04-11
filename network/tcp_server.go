@@ -1,7 +1,7 @@
 package network
 
 import (
-	"github.com/name5566/leaf/log"
+	"leaf/log"
 	"net"
 	"sync"
 	"time"
@@ -97,8 +97,8 @@ func (server *TCPServer) run() {
 		server.wgConns.Add(1)
 
 		tcpConn := newTCPConn(conn, server.PendingWriteNum, server.msgParser)
-		agent := server.NewAgent(tcpConn)
 		go func() {
+			agent := server.NewAgent(tcpConn)
 			agent.Run()
 
 			// cleanup

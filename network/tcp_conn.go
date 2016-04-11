@@ -1,7 +1,7 @@
 package network
 
 import (
-	"github.com/name5566/leaf/log"
+	"leaf/log"
 	"net"
 	"sync"
 )
@@ -14,9 +14,15 @@ type TCPConn struct {
 	writeChan chan []byte
 	closeFlag bool
 	msgParser *MsgParser
+	seed      uint32
 }
 
 func newTCPConn(conn net.Conn, pendingWriteNum int, msgParser *MsgParser) *TCPConn {
+	//tcp_conn, _ := conn.(*net.TCPConn)
+	//if tcp_conn != nil {
+	//	tcp_conn.SetLinger(0)
+	//	tcp_conn.SetNoDelay(true)
+	//}
 	tcpConn := new(TCPConn)
 	tcpConn.conn = conn
 	tcpConn.writeChan = make(chan []byte, pendingWriteNum)
@@ -110,4 +116,8 @@ func (tcpConn *TCPConn) ReadMsg() ([]byte, error) {
 
 func (tcpConn *TCPConn) WriteMsg(args ...[]byte) error {
 	return tcpConn.msgParser.Write(tcpConn, args...)
+}
+
+func (tcpConn *TCPConn) SetSeed(seed uint32) {
+	tcpConn.seed = seed
 }

@@ -1,9 +1,9 @@
 package gate
 
 import (
-	"github.com/name5566/leaf/chanrpc"
-	"github.com/name5566/leaf/log"
-	"github.com/name5566/leaf/network"
+	"leaf/chanrpc"
+	"leaf/log"
+	"leaf/network"
 	"reflect"
 	"time"
 )
@@ -55,7 +55,11 @@ func (gate *Gate) Run(closeSig chan bool) {
 		tcpServer.NewAgent = func(conn *network.TCPConn) network.Agent {
 			a := &agent{conn: conn, gate: gate}
 			if gate.AgentChanRPC != nil {
-				gate.AgentChanRPC.Go("NewAgent", a)
+				//gate.AgentChanRPC.Go("NewAgent", a)
+				err := a.gate.AgentChanRPC.Open(0).Call0("NewAgent", a)
+				if err != nil {
+					log.Error("chanrpc error: %v", err)
+				}
 			}
 			return a
 		}
@@ -141,4 +145,8 @@ func (a *agent) UserData() interface{} {
 
 func (a *agent) SetUserData(data interface{}) {
 	a.userData = data
+}
+
+func (a *agent) Conn() network.Conn {
+	return a.conn
 }

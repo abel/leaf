@@ -17,11 +17,15 @@ type MsgParser struct {
 	littleEndian bool
 }
 
+const (
+	MsgHeadLen = 2
+)
+
 func NewMsgParser() *MsgParser {
 	p := new(MsgParser)
 	p.lenMsgLen = 2
 	p.minMsgLen = 1
-	p.maxMsgLen = 4096
+	p.maxMsgLen = 65536
 	p.littleEndian = false
 
 	return p
@@ -98,10 +102,15 @@ func (p *MsgParser) Read(conn *TCPConn) ([]byte, error) {
 	}
 
 	// data
-	msgData := make([]byte, msgLen)
+	allData := make([]byte, int(msgLen)+p.lenMsgLen)
+	msgData := allData[p.lenMsgLen:]
 	if _, err := io.ReadFull(conn, msgData); err != nil {
 		return nil, err
 	}
+
+	// decode
+	copy(allData[:p.lenMsgLen], bufMsgLen)
+	decodeData(conn.seed, allData)
 
 	return msgData, nil
 }
@@ -148,7 +157,40 @@ func (p *MsgParser) Write(conn *TCPConn, args ...[]byte) error {
 		l += len(args[i])
 	}
 
+	// encode
 	conn.Write(msg)
 
 	return nil
+}
+
+func encodeData(seed uint32, buffer []byte) {
+	size := len(buffer)
+	if size <= MsgHeadLen {
+		return
+	}
+	i := 0
+	for i = 0; i < MsgHeadLen; i++ {
+		seed = (seed << 3) - seed + uint32(buffer[i])
+	}
+	for i = MsgHeadLen; i < size; i++ {
+		old := uint32(buffer[i])
+		buffer[i] = byte(seed + old)
+		seed = (seed << 3) - seed + old
+	}
+}
+
+func decodeData(seed uint32, buffer []byte) {
+	size := len(buffer)
+	if size <= MsgHeadLen {
+		return
+	}
+	i := 0
+	for i = 0; i < MsgHeadLen; i++ {
+		seed = (seed << 3) - seed + uint32(buffer[i])
+	}
+	for i = MsgHeadLen; i < size; i++ {
+		newb := byte(uint32(buffer[i]) - seed)
+		buffer[i] = newb
+		seed = (seed << 3) - seed + uint32(newb)
+	}
 }
