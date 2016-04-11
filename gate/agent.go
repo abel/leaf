@@ -1,7 +1,7 @@
 package gate
 
 import (
-	"leaf/network"
+	"github.com/abel/leaf/network"
 )
 
 type Agent interface {

@@ -1,11 +1,11 @@
 package leaf
 
 import (
-	"leaf/cluster"
-	"leaf/conf"
-	"leaf/console"
-	"leaf/log"
-	"leaf/module"
+	"github.com/abel/leaf/cluster"
+	"github.com/abel/leaf/conf"
+	"github.com/abel/leaf/console"
+	"github.com/abel/leaf/log"
+	"github.com/abel/leaf/module"
 	"os"
 	"os/signal"
 )

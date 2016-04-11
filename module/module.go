@@ -1,8 +1,8 @@
 package module
 
 import (
-	"leaf/conf"
-	"leaf/log"
+	"github.com/abel/leaf/conf"
+	"github.com/abel/leaf/log"
 	"runtime"
 	"sync"
 )

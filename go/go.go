@@ -2,8 +2,8 @@ package g
 
 import (
 	"container/list"
-	"leaf/conf"
-	"leaf/log"
+	"github.com/abel/leaf/conf"
+	"github.com/abel/leaf/log"
 	"runtime"
 	"sync"
 )

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"leaf/chanrpc"
-	"leaf/log"
+	"github.com/abel/leaf/chanrpc"
+	"github.com/abel/leaf/log"
 	"reflect"
 )
 

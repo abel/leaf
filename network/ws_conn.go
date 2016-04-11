@@ -2,7 +2,7 @@ package network
 
 import (
 	"errors"
-	"leaf/log"
+	"github.com/abel/leaf/log"
 	"net"
 	"sync"
 

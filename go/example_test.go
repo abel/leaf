@@ -2,7 +2,7 @@ package g_test
 
 import (
 	"fmt"
-	"leaf/go"
+	"github.com/abel/leaf/go"
 	"time"
 )
 

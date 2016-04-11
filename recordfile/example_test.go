@@ -2,7 +2,7 @@ package recordfile_test
 
 import (
 	"fmt"
-	"leaf/recordfile"
+	"github.com/abel/leaf/recordfile"
 )
 
 func Example() {

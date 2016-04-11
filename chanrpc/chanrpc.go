@@ -3,7 +3,7 @@ package chanrpc
 import (
 	"errors"
 	"fmt"
-	"leaf/conf"
+	"github.com/abel/leaf/conf"
 	"runtime"
 )
 

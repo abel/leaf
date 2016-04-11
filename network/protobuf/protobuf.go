@@ -4,8 +4,8 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"leaf/chanrpc"
-	"leaf/log"
+	"github.com/abel/leaf/chanrpc"
+	"github.com/abel/leaf/log"
 	"math"
 	"reflect"
 

@@ -2,7 +2,7 @@ package network
 
 import (
 	"github.com/gorilla/websocket"
-	"leaf/log"
+	"github.com/abel/leaf/log"
 	"sync"
 	"time"
 )
