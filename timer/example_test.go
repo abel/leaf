@@ -2,7 +2,7 @@ package timer_test
 
 import (
 	"fmt"
-	"github.com/abel/leaf/timer"
+	"leaf/timer"
 	"time"
 )
 
