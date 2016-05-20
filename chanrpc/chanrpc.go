@@ -3,10 +3,12 @@ package chanrpc
 import (
 	"errors"
 	"fmt"
-	"runtime"
+	"os"
+	//"runtime"
 	"runtime/debug"
+	"time"
 
-	"github.com/abel/leaf/conf"
+	//"github.com/abel/leaf/conf"
 )
 
 // one server per goroutine (goroutine not safe)
@@ -92,18 +94,18 @@ func (s *Server) ret(ci *CallInfo, ri *RetInfo) (err error) {
 func (s *Server) Exec(ci *CallInfo) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = r.(error)
-			fmt.Printf("err:%v, \r\nstack:%v", err, string(debug.Stack()))
-
-			if conf.LenStackBuf > 0 {
-				buf := make([]byte, conf.LenStackBuf)
-				l := runtime.Stack(buf, false)
-				err = fmt.Errorf("%v: %s", r, buf[:l])
-			} else {
-				err = fmt.Errorf("%v", r)
-			}
-
-			s.ret(ci, &RetInfo{err: fmt.Errorf("%v", r)})
+			stack := string(debug.Stack())
+			err = fmt.Errorf("%v\r\nstack:%v", r, stack)
+			s.ret(ci, &RetInfo{err: err})
+			//fmt.Printf("err:%v", stack)
+			//if conf.LenStackBuf > 0 {
+			//	buf := make([]byte, conf.LenStackBuf)
+			//	l := runtime.Stack(buf, false)
+			//	err = fmt.Errorf("%v: %s", r, buf[:l])
+			//} else {
+			//	err = fmt.Errorf("%v", r)
+			//}
+			//s.ret(ci, &RetInfo{err: fmt.Errorf("%v", r)})
 		}
 	}()
 
@@ -163,7 +165,6 @@ func (c *Client) call(ci *CallInfo, block bool) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = r.(error)
-			fmt.Printf("err:%v, \r\nstack:%v", err, string(debug.Stack()))
 		}
 	}()
 
@@ -333,5 +334,24 @@ func (c *Client) Cb(ri *RetInfo) {
 func (c *Client) Close() {
 	for c.pendingAsynCall > 0 {
 		c.Cb(<-c.ChanAsynRet)
+	}
+}
+
+func PanicHandler() {
+	if err := recover(); err != nil {
+		exeName := os.Args[0]                                             //获取程序名称
+		now := time.Now()                                                 //获取当前时间
+		pid := os.Getpid()                                                //获取进程ID
+		time_str := now.Format("20060102150405")                          //设定时间格式
+		fname := fmt.Sprintf("%s-%d-%s-dump.log", exeName, pid, time_str) //保存错误信息文件名:程序名-进程ID-当前时间（年月日时分秒）
+		fmt.Println("dump to file ", fname)
+		f, err := os.Create(fname)
+		if err != nil {
+			return
+		}
+		defer f.Close()
+		f.WriteString(fmt.Sprintf("%v\r\n", err)) //输出panic信息
+		f.WriteString("========\r\n")
+		f.WriteString(string(debug.Stack())) //输出堆栈信息
 	}
 }
