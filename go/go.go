@@ -2,10 +2,11 @@ package g
 
 import (
 	"container/list"
-	"github.com/abel/leaf/conf"
-	"github.com/abel/leaf/log"
 	"runtime"
 	"sync"
+
+	"github.com/abel/leaf/conf"
+	"github.com/abel/leaf/log"
 )
 
 // one Go per goroutine (goroutine not safe)

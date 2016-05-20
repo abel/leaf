@@ -3,8 +3,10 @@ package chanrpc
 import (
 	"errors"
 	"fmt"
-	"github.com/abel/leaf/conf"
 	"runtime"
+	"runtime/debug"
+
+	"github.com/abel/leaf/conf"
 )
 
 // one server per goroutine (goroutine not safe)
@@ -158,6 +160,7 @@ func (c *Client) call(ci *CallInfo, block bool) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = r.(error)
+			fmt.Printf("err:%v, \r\nstack:%v", err, string(debug.Stack()))
 		}
 	}()
 

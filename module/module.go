@@ -73,7 +73,13 @@ func PanicHandler() {
 }
 
 func run(m *module) {
-	defer PanicHandler()
+	//defer PanicHandler()
+	defer func() {
+		if r := recover(); r != nil {
+			err := r.(error)
+			fmt.Printf("err:%v, /r/nstack:%v", err, string(debug.Stack()))
+		}
+	}()
 	m.wg.Add(1)
 	m.mi.Run(m.closeSig)
 	m.wg.Done()
